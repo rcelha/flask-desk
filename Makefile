@@ -10,9 +10,11 @@ build:
 
 run: build_image
 		@echo Run flask app
-		docker run -it --rm --name="${container_name}" -p 5000:5000 ${image_name} 
+		docker-compose -f docker-compose.prod.yml up
 
 build_image:
 		@echo Build docker image;
+		docker-compose -f docker-compose.prod.yml stop
+		docker-compose -f docker-compose.prod.yml rm --force
 		docker build -t ${image_name} .
 		docker rmi ${prev}

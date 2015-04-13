@@ -1,0 +1,10 @@
+app:
+    image: rcelha/flask_desk_application
+    ports:
+        - "5000:5000"
+    links:
+        - mongo
+    volumes:
+        - flask_desk:/code/flask_desk
+mongo:
+    image: mongo:3.0
