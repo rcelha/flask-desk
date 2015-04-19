@@ -1,0 +1,6 @@
+app:
+    image: rcelha/flask_desk_application
+    ports:
+        - "5000:5000"
+mongo:
+    image: mongo:3.0

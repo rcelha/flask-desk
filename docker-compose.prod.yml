@@ -1,8 +1,10 @@
 app:
-    image: rcelha/flask_desk_application
-    ports:
-        - "5000:5000"
+    extends:
+        file: docker-compose.common.yml
+        service: app
     links:
         - mongo
 mongo:
-    image: mongo:3.0
+    extends:
+        file: docker-compose.common.yml
+        service: mongo
