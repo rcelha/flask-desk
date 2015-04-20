@@ -15,6 +15,6 @@ run: build_image
 build_image:
 		@echo Build docker image;
 		docker-compose -f docker-compose.prod.yml stop
-		docker-compose -f docker-compose.prod.yml rm --force
+		docker-compose -f docker-compose.prod.yml rm --force app
 		docker build -t ${image_name} .
 		docker rmi ${prev}

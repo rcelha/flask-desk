@@ -40,12 +40,26 @@ class SchemaResource(MethodView):
 
         return output_json({'success': True}, 200)
 
-    def get(self):
+    def _get_one(self, _id):
+        logging.debug("Getting just one: %s " % _id)
+        _id = ObjectId(_id)
+        coll = get_schema_coll()
+        ret = coll.find_one({"_id": _id})
+        return output_json(ret, 200)
+
+    def get(self, _id=None):
+        if _id is not None:
+            return self._get_one(_id)
         schema_coll = get_schema_coll()
         ret = schema_coll.find()
         return output_json(ret, 200)
 
-app.add_url_rule('/schema', view_func=SchemaResource.as_view('schema_res'))
+
+schema_resource_view = SchemaResource.as_view('schema_res')
+app.add_url_rule('/schema', view_func=schema_resource_view)
+app.add_url_rule('/schema/<string:_id>',
+                 view_func=schema_resource_view,
+                 methods=['GET', 'DELETE'])
 
 
 class TicketResource(MethodView):
@@ -88,6 +102,7 @@ class TicketResource(MethodView):
         _id = ObjectId(_id)
         coll = get_ticket_coll()
         ret = coll.find_one({"_id": _id})
+        ret['schema_url'] = "/schema/%s" % ret['schema']
         return output_json(ret, 200)
 
     def get(self, _id=None):
