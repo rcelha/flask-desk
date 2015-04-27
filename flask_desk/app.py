@@ -97,29 +97,47 @@ class TicketResource(MethodView):
         collection.insert_one(data)
         return output_json({'success': True}, 200)
 
+    def put(self, _id):
+        logging.debug("Getting just one: %s " % _id)
+        my_ticket = self._get_one(_id)
+        _id = my_ticket['_id']
+        data = request.get_json(True)
+
+        # todo :: change signal
+        if 'data' in data:
+            my_ticket['data'].update(data['data'])
+    
+        if 'status' in data:
+            my_ticket['status'] = data['status']
+
+        coll = get_ticket_coll()
+        coll.replace_one({"_id": _id}, my_ticket)
+
+        return output_json(my_ticket, 200)
+
     def _get_one(self, _id):
         logging.debug("Getting just one: %s " % _id)
         _id = ObjectId(_id)
         coll = get_ticket_coll()
         ret = coll.find_one({"_id": _id})
         ret['schema_url'] = "/schema/%s" % ret['schema']
-        return output_json(ret, 200)
+        return ret
 
     def get(self, _id=None):
         if _id is not None:
-            return self._get_one(_id)
-        collection = get_ticket_coll()
-        ret = collection.find()
+            ret = self._get_one(_id)
+        else:
+            collection = get_ticket_coll()
+            ret = collection.find()
         return output_json(ret, 200)
 
 ticket_resource_view = TicketResource.as_view('ticket_resource')
-
 app.add_url_rule('/ticket',
                  view_func=ticket_resource_view,
                  methods=['GET', 'POST'])
 app.add_url_rule('/ticket/<string:_id>',
                  view_func=ticket_resource_view,
-                 methods=['GET', 'DELETE'])
+                 methods=['PUT', 'GET', 'DELETE'])
 
 
 @app.route("/")
@@ -129,8 +147,3 @@ Possible endpoints
 - /schema
 - /ticket
 """
-
-
-if __name__ == "__main__":
-    logging.getLogger().setLevel(logging.DEBUG)
-    app.run(host="0.0.0.0", debug=True)
