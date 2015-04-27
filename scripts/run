@@ -1,0 +1,4 @@
+#!/bin/sh
+set -ex;
+./scripts/build_image;
+docker-compose -f docker-compose.prod.yml up;

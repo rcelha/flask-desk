@@ -7,4 +7,8 @@ WORKDIR /code/flask_desk
 
 EXPOSE 5000
 
+RUN useradd ispm0
+RUN useradd ispm1
+RUN useradd ispm2
+
 CMD ["python", "app.py"]
