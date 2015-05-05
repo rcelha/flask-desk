@@ -6,6 +6,11 @@ app:
         - flask_desk:/code/flask_desk
     links:
         - mongo
+        - redis
+
+redis:
+    image: redis:latest
+
 mongo:
     extends:
         file: docker-compose.common.yml

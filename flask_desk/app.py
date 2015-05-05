@@ -1,8 +1,10 @@
 #coding=utf-8
 
+import copy
 import datetime
 import logging
-from bson import ObjectId
+from bson import ObjectId, json_util
+import json
 from flask import Flask, request
 from flask.views import MethodView
 from utils import output_json, get_schema_coll, get_ticket_coll
@@ -64,6 +66,19 @@ app.add_url_rule('/schema/<string:_id>',
 
 class TicketResource(MethodView):
 
+    def pub(self, new_ticket, old_ticket=None):
+        logging.debug("trying to publish the history")
+        try:
+            import redis
+            r = redis.StrictRedis(host='redis', port=6379, db=0)
+            ret = r.publish("ticket-data", json_util.dumps({
+                'new_ticket': new_ticket,
+                'old_ticket': old_ticket
+            }))
+            logging.debug(ret)
+        except Exception as e:
+            logging.error("error while trying to pub on redis")
+            logging.error(e)
 
     def post(self):
         ret = None
@@ -95,11 +110,13 @@ class TicketResource(MethodView):
 
         collection = get_ticket_coll()
         collection.insert_one(data)
+        self.pub(data)
         return output_json({'success': True}, 200)
 
     def put(self, _id):
         logging.debug("Getting just one: %s " % _id)
         my_ticket = self._get_one(_id)
+        old_ticket = copy.deepcopy(my_ticket)
         _id = my_ticket['_id']
         data = request.get_json(True)
 
@@ -113,6 +130,7 @@ class TicketResource(MethodView):
         coll = get_ticket_coll()
         coll.replace_one({"_id": _id}, my_ticket)
 
+        self.pub(my_ticket, old_ticket)
         return output_json(my_ticket, 200)
 
     def _get_one(self, _id):

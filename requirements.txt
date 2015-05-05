@@ -2,3 +2,5 @@ flask
 ipdb
 pymongo
 flask-restful
+redis
+gevent
