@@ -5,9 +5,7 @@ from bson import ObjectId
 from flask import Flask, request
 from flask.views import MethodView
 from utils import output_json, get_schema_coll
-
-
-app = Flask("flask-desk")
+from app import app
 
 
 class SchemaResource(MethodView):

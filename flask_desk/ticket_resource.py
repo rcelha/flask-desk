@@ -7,8 +7,8 @@ from bson import ObjectId, json_util
 from flask import Flask, request
 from flask.views import MethodView
 from utils import output_json, get_schema_coll, get_ticket_coll
+from app import app
 
-app = Flask("flask-desk")
 
 class TicketResource(MethodView):
 

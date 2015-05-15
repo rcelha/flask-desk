@@ -3,7 +3,7 @@
 from flask import Flask
 
 
-app = Flask("flask-desk")
+app = Flask(__name__)
 
 from schema_resource import *
 from ticket_resource import *
@@ -11,7 +11,9 @@ from ticket_resource import *
 @app.route("/")
 def hello():
     return """
-Possible endpoints
-- /schema
-- /ticket
+<h1>Possible endpoints </h1>
+<ul>
+    <li> /schema </li>
+    <li> /ticket </li>
+</ul>
 """
